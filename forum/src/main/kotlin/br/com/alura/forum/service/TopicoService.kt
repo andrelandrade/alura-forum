@@ -1,31 +1,33 @@
 package br.com.alura.forum.service
 
-import br.com.alura.forum.dto.NovoTopicoDTO
+import br.com.alura.forum.dto.NovoTopicoForm
+import br.com.alura.forum.dto.TopicoView
+import br.com.alura.forum.mapper.TopicoFormMapper
+import br.com.alura.forum.mapper.TopicoViewMapper
 import br.com.alura.forum.model.Topico
 import org.springframework.stereotype.Service
 
 @Service
 class TopicoService(
     private var topicos: MutableList<Topico> = mutableListOf(),
-    private val cursoService: CursoService,
-    private val usuarioService: UsuarioService
+    private val topicoViewMapper: TopicoViewMapper,
+    private val topicoFormMapper: TopicoFormMapper
     ) {
 
-    fun listar(): List<Topico> {
-        return topicos
+    fun listar(): List<TopicoView> {
+        return topicos.map { topicoViewMapper.map(it) }
     }
 
-    fun buscarPorId(id: Long): Topico {
-        return topicos.first { it.id == id }
+    fun buscarPorId(id: Long): TopicoView {
+        val topico = topicos.first { it.id == id }
+
+        return topicoViewMapper.map(topico)
     }
 
-    fun cadastrar(dto: NovoTopicoDTO) {
-        topicos.add(Topico(
-            id = topicos.size + 1L,
-            titulo = dto.titulo,
-            mensagem = dto.mensagem,
-            curso = cursoService.buscarPorId(dto.idCurso),
-            autor = usuarioService.buscarPorId(dto.idAutor),
-        ))
+    fun cadastrar(form: NovoTopicoForm) {
+        val topico = topicoFormMapper.map(form)
+        topico.id = topicos.size + 1L
+
+        topicos.add(topico)
     }
 }
