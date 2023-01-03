@@ -3,6 +3,7 @@ package br.com.alura.forum.service
 import br.com.alura.forum.dto.AtualizacaoTopicoForm
 import br.com.alura.forum.dto.NovoTopicoForm
 import br.com.alura.forum.dto.TopicoView
+import br.com.alura.forum.exception.NotFoundException
 import br.com.alura.forum.mapper.TopicoFormMapper
 import br.com.alura.forum.mapper.TopicoViewMapper
 import br.com.alura.forum.model.Topico
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Service
 class TopicoService(
     private var topicos: MutableList<Topico> = mutableListOf(),
     private val topicoViewMapper: TopicoViewMapper,
-    private val topicoFormMapper: TopicoFormMapper
+    private val topicoFormMapper: TopicoFormMapper,
+    private val notFoundMessage: String = "Tópico não encontrado"
     ) {
 
     fun listar(): List<TopicoView> {
@@ -20,7 +22,7 @@ class TopicoService(
     }
 
     fun buscarPorId(id: Long): TopicoView {
-        val topico = topicos.first { it.id == id }
+        val topico = topicos.firstOrNull { it.id == id } ?: throw NotFoundException(notFoundMessage)
 
         return topicoViewMapper.map(topico)
     }
@@ -35,7 +37,7 @@ class TopicoService(
     }
 
     fun atualizar(form: AtualizacaoTopicoForm): TopicoView {
-        val topico = topicos.first { it.id == form.id }
+        val topico = topicos.firstOrNull { it.id == form.id } ?: throw NotFoundException(notFoundMessage)
 
         topicos.remove(topico)
 
@@ -56,7 +58,7 @@ class TopicoService(
     }
 
     fun deletar(id: Long) {
-        val topico = topicos.first { it.id == id }
+        val topico = topicos.firstOrNull { it.id == id } ?: throw NotFoundException(notFoundMessage)
 
         topicos.remove(topico)
     }
