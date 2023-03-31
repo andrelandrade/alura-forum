@@ -21,6 +21,7 @@ class SecurityConfiguration(
     private val configuration: AuthenticationConfiguration,
     private val jwtUtil: JWTUtil
 ) {
+
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http.
@@ -28,6 +29,7 @@ class SecurityConfiguration(
             authorizeHttpRequests()?.
             requestMatchers("/topicos")?.hasAuthority("LEITURA_ESCRITA")?.
             requestMatchers(HttpMethod.POST,"/login")?.permitAll()?.
+            requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**", "/webjars/swagger-ui/**")?.permitAll()?.
             anyRequest()?.
             authenticated()?.
             and()
