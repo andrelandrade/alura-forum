@@ -10,6 +10,8 @@ import br.com.alura.forum.mapper.TopicoViewMapper
 import br.com.alura.forum.model.Topico
 import br.com.alura.forum.repository.TopicoRepository
 import jakarta.persistence.EntityManager
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -24,17 +26,18 @@ class TopicoService(
     private val notFoundMessage: String = "Tópico não encontrado",
 ) {
 
+    @Cacheable("topicos")
     fun listar(
         nomeCurso: String?,
         paginacao: Pageable
     ): Page<TopicoView> {
-        val topicos = if (nomeCurso == null) {
-            repository.findAll(paginacao)
-        } else {
+        val topicos = nomeCurso?.let {
             repository.findByCursoNome(nomeCurso, paginacao)
-        }
+        } ?: repository.findAll(paginacao)
 
-        return topicos.map { topicoViewMapper.map(it) }
+        return topicos.map { t ->
+            topicoViewMapper.map(t)
+        }
     }
 
     fun buscarPorId(id: Long): TopicoView {
@@ -43,6 +46,7 @@ class TopicoService(
         return topicoViewMapper.map(topico)
     }
 
+    @CacheEvict(value = ["topicos"], allEntries = true)
     fun cadastrar(form: NovoTopicoForm): TopicoView {
         val topico = topicoFormMapper.map(form)
 
@@ -51,6 +55,7 @@ class TopicoService(
         return topicoViewMapper.map(topico)
     }
 
+    @CacheEvict(value = ["topicos"], allEntries = true)
     fun atualizar(form: AtualizacaoTopicoForm): TopicoView {
         val topico = repository.findByIdOrNull(form.id) ?: throw NotFoundException(notFoundMessage)
 
@@ -61,6 +66,7 @@ class TopicoService(
         return topicoViewMapper.map(topico)
     }
 
+    @CacheEvict(value = ["topicos"], allEntries = true)
     fun deletar(id: Long) {
         repository.deleteById(id)
     }

@@ -1,6 +1,7 @@
 package br.com.alura.forum.model
 
 import jakarta.persistence.*
+import java.io.Serializable
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -20,4 +21,4 @@ data class Topico(
     @OneToMany(mappedBy = "topico")
     val respostas: List<Resposta> = ArrayList(),
     var dataAlteracao: LocalDate? = null
-)
+) : Serializable
