@@ -29,6 +29,7 @@ class SecurityConfiguration(
             authorizeHttpRequests()?.
             requestMatchers("/topicos")?.hasAuthority("LEITURA_ESCRITA")?.
             requestMatchers("/respostas")?.hasAuthority("LEITURA_ESCRITA")?.
+            requestMatchers("/relatorios")?.hasAuthority("ADMIN")?.
             requestMatchers(HttpMethod.POST,"/login")?.permitAll()?.
             requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**", "/webjars/swagger-ui/**")?.permitAll()?.
             anyRequest()?.
